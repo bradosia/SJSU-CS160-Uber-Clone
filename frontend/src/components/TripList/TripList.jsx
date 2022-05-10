@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import Trip from "./Trip"
 import axios from "axios"
+import * as Constants from "../../constants.js"
 
 const TripList = ({ trips, user }) => {
   const [tripList, setTripList] = useState([])
@@ -8,14 +9,15 @@ const TripList = ({ trips, user }) => {
   useEffect(() => {
     trips.sort((a,b) => a._id < b._id)
     trips.forEach( (t) =>{
-      axios.post("http://localhost:5000/trip", { data: t}).then((res) => {
-        //console.log(res.data.trip)
+      axios.post(Constants.AUTHENTICATION_SERVER + "/trip", { data: t}).then((res) => {
+        console.log(res.data.trip)
         const trip = res.data.trip
-        const otherID = (user._id === trip.riderID) ? trip.driverID : user._id
-        const other = (user._id === trip.riderID) ? trip.driver : trip.rider
-        axios.post('http://localhost:5000/user', { data: otherID}).then((res) => {
-          const otherRating = res.data.user.rating
-          const newTrip = <Trip key={otherID} user={user} trip={trip} other={other} otherID={otherID} otherRating={otherRating} wasRider={user._id===trip.riderID}/>
+        const otherID = (user._id === trip.riderId) ? trip.driverId : user._id
+        const other = (user._id === trip.riderId) ? trip.driverName : trip.riderName
+        axios.post(Constants.AUTHENTICATION_SERVER + "/user", { data: otherID}).then((res) => {
+          console.log(res.data)
+          const otherRating = 0
+          const newTrip = <Trip key={otherID} user={user} trip={trip} other={other} otherID={otherID} otherRating={otherRating} wasRider={user._id===trip.riderId}/>
         setTripList((list) => [...list, newTrip])
         })
       })
